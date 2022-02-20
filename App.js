@@ -1,87 +1,141 @@
-import { useFonts } from '@expo-google-fonts/josefin-sans'
-import React from 'react'
-import { StyleSheet, Image, StatusBar, Text, View, Button, Linking, TouchableOpacity } from 'react-native'
-import { JosefinSans_100Thin, JosefinSans_700Bold,JosefinSans_400Regular } from '@expo-google-fonts/josefin-sans'
-import AppLoading from 'expo-app-loading'
-const App = () => {
+import { StyleSheet, Text, View, StatusBar, ScrollView, Button } from 'react-native'
+import React, { useState } from 'react'
 
-  let [fontsLoaded] = useFonts({
-    JosefinSans_100Thin,
-    JosefinSans_700Bold,
-    JosefinSans_400Regular
-  })
 
-  if(!fontsLoaded){
-    return <AppLoading />
+export default function App() {
+  const alignItemsArr = [
+    'flex-start',
+    'flex-end',
+    'center',
+    'stretch',
+    'baseline',
+  ];
+  const directions = ['inherit', 'ltr', 'rtl'];
+  const flexdirectionArr = ['row', 'row-reverse', 'column', 'column-reverse'];
+  const justifyContentArr = ['flex-start', 'flex-end', 'center', 'space-between', 'space-around'];
+  const flexwrapArr = ['nowrap', 'wrap', 'wrap-reverse'];
+  const [sqaures, setsqaures] = useState([<Square />, <Square />])
+  const [alignItems, setalignItems] = useState(0)
+  const [justifyContents, setjustifyContents] = useState(0)
+  const [direction, setDirection] = useState(0);
+  const [flexDirections, setflexDirections] = useState(0)
+  const [wraps, setwraps] = useState(0)
+  const changeSetting = (value, options, setterFunction) => {
+    if (value == options.length - 1) {
+      setterFunction(0);
+      return;
+    }
+    setterFunction(value + 1);
+  };
+
+  const squaresStyleHooks = {
+    alignItems: alignItemsArr[alignItems],
+    justifyContent: justifyContentArr[justifyContents],
+    direction: directions[direction],
+    flexDirection: flexdirectionArr[flexDirections],
+    flexWrap: flexwrapArr[wraps],
   }
 
+
   return (
-    <>
-      <StatusBar barStyle="dark-content" hidden={false} backgroundColor="orange" translucent={true} />
-      <View style={styles.container}>
-        <Text style={styles.header}> Netflix Card</Text>
+    <View style={styles.container}>
 
 
-        <View style={styles.poster}>
-          <Image source={require("./assets/123.jpg")} style={styles.imgStyle} />
+      <View style={[styles.playZone, squaresStyleHooks]}>
+        {sqaures.map(ele => ele)}
+      </View>
 
 
-          <View style={styles.poster__info}>
-            <Text style={styles.poster__title}>All of us Dead</Text>
-            <Text style={styles.poster__text}>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum dolores ipsa earum obcaecati voluptatem saepe quae eos cumque! In, ab.
-            </Text>
+
+      <ScrollView style={{ height: "50%" }}>
+        <View style={styles.buttons}>
+
+          <View style={styles.buttonView}>
+            <Button title="Add Square" style={styles.btnstyle} onPress={() => { setsqaures([...sqaures, <Square />]) }} />
           </View>
 
-          <Button title="Watch Now" onPress={() =>
-            Linking.openURL('https://www.netflix.com/watch/80109847')}
-          />
+          <View style={styles.buttonView}>
+            <Button title="Remove Square" onPress={() => { setsqaures(sqaures.filter((v, i) => i != sqaures.length - 1)) }} />
+          </View>
+
+
+          <View style={styles.buttonView}>
+            <Button title="Align Items" onPress={() => { changeSetting(alignItems, alignItemsArr, setalignItems) }} />
+            <Text style={styles.text}>{alignItemsArr[alignItems]}</Text>
+
+          </View>
+
+          <View style={styles.buttonView}>
+            <Button title="Justify Content" onPress={() => { changeSetting(justifyContents, justifyContentArr, setjustifyContents) }} />
+            <Text style={styles.text}>{justifyContentArr[justifyContents]}</Text>
+          </View>
+
+
+          <View style={styles.buttonView}>
+            <Button title="Change Direction" onPress={() => { changeSetting(direction, directions, setDirection) }} />
+            <Text style={styles.text}>{directions[direction]}</Text>
+          </View>
+
+          <View style={styles.buttonView}>
+            <Button title="Flex Direction" onPress={() => { changeSetting(flexDirections, flexdirectionArr, setflexDirections) }} />
+            <Text style={styles.text}>{flexdirectionArr[flexDirections]}</Text>
+
+          </View>
+
+          <View style={styles.buttonView}>
+            <Button title="Flex Wrap" onPress={() => { changeSetting(wraps, flexwrapArr, setwraps) }} />
+            <Text style={styles.text}>{flexwrapArr[wraps]}</Text>
+
+          </View>
+
         </View>
-      </View>
-    </>
+
+      </ScrollView>
+
+
+
+    </View>
   )
 }
 
-export default App
 
+// create component to generate the square of size 100 x 100
+const Square = () => (
+  <View style={{
+    width: 80,
+    height: 80,
+    backgroundColor: randomHexColor(),
+  }} />
+);
+function randomHexColor() {
+  return '#' + Math.floor(Math.random() * 16777215).toString(16);
+}
 const styles = StyleSheet.create({
   container: {
-    padding: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: StatusBar.currentHeight,
   },
-  header: {
-    fontSize: 30,
-    marginBottom: 20,
-    fontFamily: 'JosefinSans_700Bold',
-  },
-  imgStyle: {
-    width: "100%",
-    height: undefined,
-    aspectRatio: 1,
-    borderRadius: 5
-  },
-  poster: {
-    width: 250,
+  playZone: {
+    height: '50%',
     borderWidth: 2,
-    borderRadius: 8,
-    alignItems: 'center',
+    borderRadius: 10,
   },
-  poster__info: {
-    alignItems: 'center',
-    marginVertical: 20
+  buttons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: "center",
+    backgroundColor: '#F5F5F5',
   },
-  poster__title: {
-    fontSize: 20,
-    marginBottom: 10,
-    fontFamily: 'JosefinSans_400Regular',
+  buttonView: {
+    width: '50%',
+    padding: 15,
   },
-  poster__text: {
-    color: '#999',
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    fontSize: 16,
-    fontFamily: 'JosefinSans_400Regular',
-    textAlign: 'center'
+
+  text: {
+    fontSize: 19,
+    textAlign: 'center',
+    textTransform: "capitalize",
+  },
+  btnstyle: {
+    fontSize: 30,
   }
 })
